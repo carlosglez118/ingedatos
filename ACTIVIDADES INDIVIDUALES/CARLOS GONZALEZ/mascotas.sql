@@ -1,5 +1,5 @@
 -- CREATE DATABASE Mascotas;
--- USE DATABASE Mascotas;
+USE Mascotas;
 -- Tabla mascota
 CREATE TABLE Mascota(
 	idMascota INT PRIMARY KEY,
@@ -50,3 +50,30 @@ CREATE TABLE Mascota_vacuna(
 ALTER TABLE Producto ADD COLUMN cantidad INT NOT NULL;
 ALTER TABLE Mascota CHANGE COLUMN cantidad cantidadMascota INT;
 ALTER TABLE Mascota_vacuna RENAME TO detalle_vacuna;
+ALTER TABLE Cliente CHANGE COLUMN telefono telefono VARCHAR(20);
+
+SELECT * FROM Mascota;
+SELECT * FROM Cliente;
+SELECT * FROM Producto;
+SELECT * FROM Vacuna;
+SELECT * FROM detalle_vacuna;
+SELECT * FROM Producto;
+DESCRIBE Mascota;
+DESCRIBE Producto;
+DESCRIBE Cliente;
+DESCRIBE Vacuna;
+DESCRIBE detalle_vacuna;
+INSERT INTO Vacuna VALUES(1, 'Clembuterol', 1, 'Moquillo'), (2, 'Penicilina', 1, 'Fiebre');
+INSERT INTO Cliente VALUES (548874, 'Cristian', 'Ruiz', 'AVCL 19 #81', 3312457889, 1);
+INSERT INTO Cliente VALUES (1639980, 'Lucia', 'Bravo', '5 de mayo #122', 3521104887, 2);
+INSERT INTO Producto VALUES (1, 'Shampoo', 'Perro consentido', 10500, 548874, 1);
+INSERT INTO Producto VALUES(2, 'Cepillo', 'PetCare', 9500, 1639980, 1);
+INSERT INTO Mascota VALUES(1, 'Rusth', 'M', 'Criollo', 1);
+INSERT INTO Mascota VALUES(2, 'Lisa', 'F', 'Criollo', 1), (3, 'Bravo', 'M', 'Criollo', 1);
+INSERT INTO Mascota VALUES(4, '', '', '', '');
+INSERT INTO detalle_vacuna VALUES(1, 1, 'Moquillo');
+INSERT INTO detalle_vacuna VALUES(2, 2, 'Fiebre');
+UPDATE Cliente SET telefono = '3521104887' WHERE cedulaCliente=548874;
+UPDATE Cliente SET telefono = '3312457889' WHERE cedulaCliente=1639980;
+
+
