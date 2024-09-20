@@ -58,6 +58,7 @@ insert into mascota values (1, 'bola', 'mujer','cruzado', 4);
 insert into mascota values (4, '', '','', '');
 insert into mascota values (2, 'Pluto', 'masculino','criollo', 2), (3, 'nini', 'mujer','mestizo', 1);
 insert into producto values (1, 'jabon', 'dove', '10900','1203', 3);
+insert into producto values (2, 'Shampoo', 'dove', '20900','4983', 12);
 insert into vacuna values (1, 'AstraZeneca', '10ml', 'moquillo'), (2, 'Pfizer', '15ml', 'rabia');
 insert into vacuna values (3, 'AstraZeneca', '5ml', 'Pentavelante');
 
@@ -69,6 +70,7 @@ update cliente set telefono='3525932010' where cedulaCliente=4983;
 alter table cliente change column telefono telefono varchar(15);
 
 insert into detalle_vacuna values(1, 3, 'moquillo'), (2, 1, 'rabia');
+insert into producto values(1, 'Shampoo', 'moquillo'), (2, 1, 'rabia');
 
 select *from mascota;
 select *from vacuna;
@@ -77,4 +79,67 @@ describe producto;
 describe cliente;
 describe vacuna;
 describe mascota;
+describe detalle_vacuna;
+use mascotas;
+
+select nombreMascota, razaMascota from mascota;
+select * from mascota where idMascota ='1';
+
+select cedulaCliente AS 'Documento', direccionCliente AS 'Direccion' from cliente;
+select *from cliente;
+describe vacuna;
+describe producto;
+/*1er Ejercicio*/
+
+select razaMascota AS 'raza', idMascota AS 'ID' from mascota;
+select nombreVacuna AS 'vacuna', dosisVacuna AS 'dosis' from vacuna;
+select cedulaClienteFK AS 'Cliente', nombreProducto AS 'producto' from producto;
+
+
+select nombreCliente AS 'Cliente', cedulaCliente as 'Documento'from cliente order by cedulaCliente DESC;
+
+select idMascota as 'ID', generoMascota as 'Genero' from mascota order by generoMascota DESC;
+
+select marca, nombreProducto as 'Producto' from producto order by precio DESC;
+
+select nombreMascota from mascota where idMascota >1;
+
+select nombreProducto from producto where precio >11000;
+
+select enfermedad from detalle_vacuna where codigoVacunaFK =1;
+
+select nombreProducto from producto where precio >10000 or codigoProducto <2;
+
+select enfermedad from vacuna where nombreVacuna = 'Pfizer' or dosisVacuna = '10ml';
+select codigoVacuna from vacuna where dosisVacuna = '10ml' or enfermedad = 'rabia';
+
+select cedulaCliente from cliente where nombreCliente ='Cristian' and  apellidoCliente='Ruiz';
+select cedulaCliente, nombreCliente from cliente where telefono='3525932010' or  idMascotaFK=1;
+
+select nombreMascota, generoMascota  from mascota where razaMascota ='criollo' and cantidadMascota >= 2;
+select nombreMascota  from mascota where  generoMascota='mujer' or cantidadMascota > 0;
+
+select nombreProducto from producto where precio between  1000 and 100000;
+/*
+select nombreMascota from mascota where generoMascota like'f%' or generoMascota like 'mu%'; 
+select nombreMascota from mascota where generoMascota like'f%' or generoMascota like 'mu%'; 
+
+select nombreMascota from cliente where generoMascota like'f%' or generoMascota like 'mu%'; 
+select nombreMascota from cliente where generoMascota like'f%' or generoMascota like 'mu%'; 
+
+select nombreMascota from producto where generoMascota like'f%' or generoMascota like 'mu%'; 
+select nombreMascota from producto where generoMascota like'f%' or generoMascota like 'mu%'; 
+
+select nombreMascota from vauna where generoMascota like'f%' or generoMascota like 'mu%'; 
+select nombreMascota from vacuna where generoMascota like'f%' or generoMascota like 'mu%'; 
+
+select nombreMascota from detalle_vacuna where generoMascota like'f%' or generoMascota like 'mu%'; 
+select nombreMascota from detalle_vacuna where generoMascota like'f%' or generoMascota like 'mu%'; 
+*/
+
+
+select*from mascota;
+describe mascota;
+describe vacuna;
+describe cliente;
 describe detalle_vacuna;
