@@ -120,22 +120,26 @@ select nombreMascota, generoMascota  from mascota where razaMascota ='criollo' a
 select nombreMascota  from mascota where  generoMascota='mujer' or cantidadMascota > 0;
 
 select nombreProducto from producto where precio between  1000 and 100000;
-/*
+use mascotas;
+describe mascota;
+
 select nombreMascota from mascota where generoMascota like'f%' or generoMascota like 'mu%'; 
-select nombreMascota from mascota where generoMascota like'f%' or generoMascota like 'mu%'; 
+select idMascota, nombreMascota from mascota where razaMascota like'crio%' or generoMascota like 'mest%'; 
+describe cliente;
 
-select nombreMascota from cliente where generoMascota like'f%' or generoMascota like 'mu%'; 
-select nombreMascota from cliente where generoMascota like'f%' or generoMascota like 'mu%'; 
+select nombreCliente, apellidoCliente, direccionCliente from cliente where telefono like'33%'; 
+select nombreCliente, idMascotaFK from cliente where direccionCliente like'%19%'; 
+describe producto;
 
-select nombreMascota from producto where generoMascota like'f%' or generoMascota like 'mu%'; 
-select nombreMascota from producto where generoMascota like'f%' or generoMascota like 'mu%'; 
+select cedulaClienteFK, nombreProducto from producto where marca like'%ve'; 
+select codigoProducto, NombreProducto, precio  from producto where nombreProducto like'%b%'; 
+describe vacuna;
+select nombreVacuna, dosisVacuna from vacuna where enfermedad like'%b%'; 
+select enfermedad from vacuna where nombreVacuna like'%f%'; 
+describe detalle_vacuna;
+select idMascotaFK from detalle_vacuna where enfermedad like'%o%'; 
+select codigoVacunaFK from detalle_vacuna where enfermedad like'ra%'; 
 
-select nombreMascota from vauna where generoMascota like'f%' or generoMascota like 'mu%'; 
-select nombreMascota from vacuna where generoMascota like'f%' or generoMascota like 'mu%'; 
-
-select nombreMascota from detalle_vacuna where generoMascota like'f%' or generoMascota like 'mu%'; 
-select nombreMascota from detalle_vacuna where generoMascota like'f%' or generoMascota like 'mu%'; 
-*/
 
 
 select*from mascota;
