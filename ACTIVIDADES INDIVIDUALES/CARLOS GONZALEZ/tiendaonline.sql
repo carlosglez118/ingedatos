@@ -92,3 +92,32 @@ SELECT SUM(precio_unitario) FROM detalle_venta;
 SELECT MIN(precio_unitario) FROM detalle_venta;
 SELECT COUNT(*) AS cantidad_clientes FROM Cliente;
 
+
+SELECT * FROM Venta INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente;
+
+-- Consultar cliente de la maxima venta hecha
+SELECT Cliente.nombreCliente, Venta.idVenta, SUM(detalle_venta.cantidad * detalle_venta.precio_unitario) AS total_venta
+FROM Venta
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente
+INNER JOIN detalle_venta ON Venta.idVenta = detalle_venta.idVentaFK
+GROUP BY Venta.idVenta
+ORDER BY total_venta DESC
+LIMIT 1;
+
+-- Consultar usuario y cliente de una venta especifica
+SELECT Venta.idVenta, Usuario.nombreUsuario, Cliente.nombreCliente
+FROM Venta
+INNER JOIN Usuario ON Venta.idUsuarioFK = Usuario.idUsuario
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente
+WHERE Venta.idVenta = 1;
+-- Consultar los productos que compro un cliente especifico
+SELECT Producto.nombreProducto, detalle_venta.cantidad, detalle_venta.precio_unitario
+FROM detalle_venta
+INNER JOIN Producto ON detalle_venta.codigoBarrasFK = Producto.codigoBarras
+INNER JOIN Venta ON detalle_venta.idVentaFK = Venta.idVenta
+WHERE Venta.idClienteFK = 1;
+-- Consultar todos los clientes que han hecho compras
+SELECT DISTINCT Cliente.nombreCliente, Cliente.correoCliente, Cliente.telefonoCliente
+FROM Venta
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente;
+
