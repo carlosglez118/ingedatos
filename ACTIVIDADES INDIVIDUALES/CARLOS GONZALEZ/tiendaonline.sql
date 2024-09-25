@@ -92,6 +92,7 @@ SELECT SUM(precio_unitario) FROM detalle_venta;
 SELECT MIN(precio_unitario) FROM detalle_venta;
 SELECT COUNT(*) AS cantidad_clientes FROM Cliente;
 
+
 SELECT * FROM Venta INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente;
 
 -- Consultar cliente de la maxima venta hecha
@@ -119,3 +120,4 @@ WHERE Venta.idClienteFK = 1;
 SELECT DISTINCT Cliente.nombreCliente, Cliente.correoCliente, Cliente.telefonoCliente
 FROM Venta
 INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente;
+
