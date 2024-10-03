@@ -142,6 +142,10 @@ select codigoVacunaFK from detalle_vacuna where enfermedad like'ra%';
 
 
 
+select m.*, c.nombreCliente, max(cantidadMascota) from mascota m inner join cliente c on m.idMascota = c.idMascotaFK;
+select m.*, c.nombreCliente, p.nombreProducto from mascota m inner join cliente c on m.idMascota = c.idMascotaFK
+inner join producto p on p.cedulaCienteFK = c.cedulaCliente;
+
 select*from mascota;
 describe mascota;
 describe vacuna;
