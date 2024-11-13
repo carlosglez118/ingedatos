@@ -92,3 +92,163 @@ SELECT SUM(precio_unitario) FROM detalle_venta;
 SELECT MIN(precio_unitario) FROM detalle_venta;
 SELECT COUNT(*) AS cantidad_clientes FROM Cliente;
 
+SELECT * FROM Venta INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente;
+
+-- Consultar cliente de la maxima venta hecha
+SELECT Cliente.nombreCliente, Venta.idVenta, SUM(detalle_venta.cantidad * detalle_venta.precio_unitario) AS total_venta
+FROM Venta
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente
+INNER JOIN detalle_venta ON Venta.idVenta = detalle_venta.idVentaFK
+GROUP BY Venta.idVenta
+ORDER BY total_venta DESC
+LIMIT 1;
+
+-- Consultar usuario y cliente de una venta especifica
+SELECT Venta.idVenta, Usuario.nombreUsuario, Cliente.nombreCliente
+FROM Venta
+INNER JOIN Usuario ON Venta.idUsuarioFK = Usuario.idUsuario
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente
+WHERE Venta.idVenta = 1;
+-- Consultar los productos que compro un cliente especifico
+SELECT Producto.nombreProducto, detalle_venta.cantidad, detalle_venta.precio_unitario
+FROM detalle_venta
+INNER JOIN Producto ON detalle_venta.codigoBarrasFK = Producto.codigoBarras
+INNER JOIN Venta ON detalle_venta.idVentaFK = Venta.idVenta
+WHERE Venta.idClienteFK = 1;
+-- Consultar todos los clientes que han hecho compras
+SELECT DISTINCT Cliente.nombreCliente, Cliente.correoCliente, Cliente.telefonoCliente
+FROM Venta
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente;
+SELECT * FROM Producto;
+
+delimiter //
+CREATE PROCEDURE crear_producto(
+idProducto INT, 
+codigoBarras varchar(50), 
+nombreProducto varchar(50), 
+precioProducto DECIMAL, 
+stock INT)
+BEGIN
+	INSERT INTO Producto (idProducto, codigoBarras, nombreProducto, precioProducto, stock) 
+    VALUES(idProducto, codigoBarras, nombreProducto, precioProducto, stock);
+
+END //
+delimiter ;
+
+CALL crear_producto('','100004','Marcadores', 20000, 200);
+
+CREATE VIEW consultar_cliente AS
+SELECT * FROM Cliente;
+
+SELECT * FROM consultar_cliente;
+
+
+/* Crear 3 procedimientos para inactivar un cliente,  para consultar los productos
+que ha comprado un cliente, y para modificar la fecha de nacimiento de cliente*/
+
+-- Inactivar un cliente
+DELIMITER //
+CREATE PROCEDURE inactivar_cliente(
+    IN idCliente INT
+)
+BEGIN
+    UPDATE Cliente
+    SET fecha_registro = NULL
+    WHERE idCliente = idCliente;
+END //
+DELIMITER ;
+
+-- Productos comprados por un cliente
+DELIMITER //
+CREATE PROCEDURE productos_comprados_por_cliente(
+    IN idCliente INT
+)
+BEGIN
+    SELECT Producto.nombreProducto, detalle_venta.cantidad, detalle_venta.precio_unitario
+    FROM detalle_venta
+    INNER JOIN Producto ON detalle_venta.codigoBarrasFK = Producto.codigoBarras
+    INNER JOIN Venta ON detalle_venta.idVentaFK = Venta.idVenta
+    WHERE Venta.idClienteFK = idCliente;
+END //
+DELIMITER ;
+
+-- Cambiar fecha de registro
+DELIMITER //
+CREATE PROCEDURE modificar_fecha_registro_cliente(
+    IN idCliente INT,
+    IN nuevaFecha DATE
+)
+BEGIN
+    UPDATE Cliente
+    SET fecha_registro = nuevaFecha
+    WHERE idCliente = idCliente;
+END //
+DELIMITER ;
+
+-- Cliente que compro un producto y numero de orden
+CREATE VIEW cliente_que_compro_producto AS
+SELECT Cliente.nombreCliente, Venta.idVenta, Producto.nombreProducto
+FROM Venta
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente
+INNER JOIN detalle_venta ON Venta.idVenta = detalle_venta.idVentaFK
+INNER JOIN Producto ON detalle_venta.codigoBarrasFK = Producto.codigoBarras;
+
+
+-- Cliente con mas compras realizadas
+CREATE VIEW cliente_mas_compras AS
+SELECT Cliente.nombreCliente, COUNT(Venta.idVenta) AS numero_compras
+FROM Venta
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente
+GROUP BY Cliente.idCliente
+ORDER BY numero_compras DESC
+LIMIT 1;
+
+/* Subconsultas: son consultas anidadas dentro de otra consulta
+select campo2, campo3 from tablagrande 
+where columna2=(select columna2x from otratabla where condicion);
+*/
+
+/*Consultar los datos de los empleadods y su sueldo promedio*/
+SELECT idEmpleado, nombreEmpleado, salario, (SELECT AVG(salario) FROM empleado) as promedio FROM empleado;
+
+/* Empleado que tenga un salario mayor que el salario promedio */
+SELECT idEmpleado, nombreEmpleado, salario
+FROM empleado WHERE salario > (SELECT AVG(salario)
+FROM empleado);
+
+/*consultar area a la que pertenece un empleado*/
+SELECT idEmpleado, nombreEmpleado, idArea, nombreArea
+FROM empleado 
+WHERE idArea in (SELECT idArea FROM area WHERE nombreEmpleado = 'Juan');
+
+
+/*Calcular los productos que se vendan a un precio mayor del promedio de todos los productos*/
+SELECT nombreProducto, precioProducto
+FROM Producto
+WHERE precioProducto > (SELECT AVG(precioProducto) FROM producto);
+/*Mostrar los clientes que el total de compra sea mayor al promedio de compras de la tienda*/
+SELECT Cliente.nombreCliente, SUM(detalle_venta.cantidad * detalle_venta.precio_unitario) AS total_compra
+FROM Venta
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente
+INNER JOIN detalle_venta ON Venta.idVenta = detalle_venta.idVentaFK
+GROUP BY Cliente.idCliente
+HAVING total_compra > (
+    SELECT AVG(total_venta)
+    FROM (
+        SELECT SUM(detalle_venta.cantidad * detalle_venta.precio_unitario) AS total_venta
+        FROM Venta
+        INNER JOIN detalle_venta ON Venta.idVenta = detalle_venta.idVentaFK
+        GROUP BY Venta.idVenta
+    ) AS subquery
+);
+
+/*Mostrar el promedio de precios de productos comprados por un cliente*/
+SELECT Cliente.nombreCliente, AVG(detalle_venta.precio_unitario) AS promedio_precio_compras
+FROM detalle_venta
+INNER JOIN Venta ON detalle_venta.idVentaFK = Venta.idVenta
+INNER JOIN Cliente ON Venta.idClienteFK = Cliente.idCliente
+GROUP BY Cliente.idCliente;
+
+
+/* Crear 2 vistas una que consulte que cliente compro un producto y numero de orden
+y una que muestre el cliente que más compras haya hecho */
