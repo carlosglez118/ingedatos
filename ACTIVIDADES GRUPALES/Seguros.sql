@@ -61,6 +61,7 @@ CREATE TABLE Pago (
     FOREIGN KEY (numeroPolizaFK) REFERENCES Poliza(numeroPoliza)
 );
 
+
 INSERT INTO Cliente (nombreCliente, direccionCliente, telefonoCliente, emailCliente) VALUES
 ('Juan Pérez', 'Av. Siempre Viva 123', '555-1234', 'juanperez1@gmail.com'),
 ('María García', 'Calle Falsa 456', '555-5678', 'maria.garcia2@yahoo.com'),
@@ -282,7 +283,7 @@ INSERT INTO Pago ( metodoPago, montoPago, numeroPolizaFK) VALUES
 ('Tarjeta de Débito', 1700.00, 'A1049'),
 ('Tarjeta de Crédito', 1750.00, 'A1050');
 
-
+ -- Consultas Basicas
 SELECT * FROM Cliente;
 SELECT * FROM Usuario;
 SELECT * FROM Pago;
@@ -290,11 +291,15 @@ SELECT * FROM Poliza;
 SELECT * FROM Aseguradora;
 SELECT * FROM Vehiculo;
 
-
+ -- Consultas específicas
+ 
+ -- Obtener clientes que hayan realizado un pago mayor a $2000
 SELECT c.nombreCliente, p.montoPago FROM Cliente c
 JOIN Poliza po ON c.idCliente = po.idClienteFK
 JOIN Pago p ON po.numeroPoliza = p.numeroPolizaFK
 WHERE p.montoPago > 2000;
+
+  -- Mostrar vehículos asegurados por una determinada aseguradora
 
 SELECT v.marcaVehiculo, v.modeloVehiculo, a.nombreAseguradora
 FROM Vehiculo v
@@ -302,21 +307,29 @@ JOIN Poliza p ON v.idVehiculo = p.idVehiculoFK
 JOIN Aseguradora a ON p.idAseguradoraFK = a.idAseguradora
 WHERE a.nombreAseguradora like  '%AXA%';
 
+ -- Obtener el total pagado por cada cliente 
+ 
 SELECT c.nombreCliente, SUM(p.montoPago) AS totalPagado
 FROM Cliente c
 JOIN Poliza po ON c.idCliente = po.idClienteFK
 JOIN Pago p ON po.numeroPoliza = p.numeroPolizaFK
 GROUP BY c.nombreCliente;
 
+ -- Clientes cuyo seguro vence en los próximos 30 días
+
 SELECT c.nombreCliente, po.fechaFin
 FROM Cliente c
 JOIN Poliza po ON c.idCliente = po.idClienteFK
 WHERE po.fechaFin BETWEEN CURDATE() AND CURDATE() + INTERVAL 30 DAY;
 
+  -- Consultar las pólizas activas que lleva a cargo los usuarios
+
 SELECT u.nombreUsuario, po.numeroPoliza, po.fechaInicio, po.fechaFin
 FROM Usuario u
 JOIN Poliza po ON u.idUsuario = po.idUsuarioFK
 WHERE u.rolUsuario like '%admin%';
+
+ -- Aseguradoras que han emitido más de 10 pólizas
 
 SELECT a.nombreAseguradora, COUNT(po.numeroPoliza) AS totalPolizas
 FROM Aseguradora a
@@ -324,34 +337,59 @@ JOIN Poliza po ON a.idAseguradora = po.idAseguradoraFK
 GROUP BY a.nombreAseguradora
 HAVING COUNT(po.numeroPoliza) > 10;
 
+ -- Vehículos asegurados durante un periodo específico.
+select *from vehiculo;
+
+select c.nombreCliente, po.fechaInicio, po.fechaFin, a.nombreAseguradora, v.marcaVehiculo, v.modeloVehiculo
+from Vehiculo v inner join poliza po on v.idVehiculo = po.idVehiculoFK
+inner join aseguradora a on a.idAseguradora = po.idAseguradoraFK
+inner join cliente c on c.idCliente = po.idClienteFK;
+
+
 SELECT v.marcaVehiculo, v.modeloVehiculo, po.fechaInicio, po.fechaFin
 FROM Vehiculo v
 JOIN Poliza po ON v.idVehiculo = po.idVehiculoFK
 WHERE po.fechaInicio BETWEEN '2023-01-01' AND '2023-12-31';
 
+ -- Modificaciones
+ -- Actualizar el teléfono de un cliente
 UPDATE Cliente SET telefonoCliente = '555-9876' WHERE idCliente = 1;
+
+-- Cambiar el rol de un usuario
 
 UPDATE Usuario SET rolUsuario = 'Usuario' WHERE idUsuario = 2;
 
+ -- Actualizar la fecha de fin de una póliza
+
 UPDATE Poliza SET fechaFin = '2024-12-31' WHERE numeroPoliza = 'A1001';
 
+ -- Cambiar el método de pago
+ 
 UPDATE Pago SET metodoPago = 'Transferencia bancaria' WHERE idPago = 1;
+
+-- Actualizar la dirección de un cliente
 
 UPDATE Cliente SET direccionCliente = 'Calle Falsa 123' WHERE idCliente = 1;
 
-select *from Cliente;
+ -- Eliminación 
 
+ -- Eliminación de un cliente
+ 
 DELETE FROM Cliente WHERE idCliente = 51;
 
-
+ -- Consultas Multitablas
+ -- Obtener el nombre del cliente, la póliza y el monto pagado
 SELECT c.nombreCliente, po.numeroPoliza, p.montoPago
 FROM Cliente c
 JOIN Poliza po ON c.idCliente = po.idClienteFK
 JOIN Pago p ON po.numeroPoliza = p.numeroPolizaFK;
-
+ -- SubConsultas 
+ -- Obtener el cliente que ha pagado más
 SELECT nombreCliente
 FROM Cliente
-WHERE idCliente = (SELECT idClienteFK FROM Poliza WHERE numeroPoliza = (SELECT numeroPolizaFK FROM Pago ORDER BY monto DESC LIMIT 1));
+WHERE idCliente = (SELECT idClienteFK FROM Poliza WHERE numeroPoliza = (SELECT numeroPolizaFK FROM Pago ORDER BY montoPagado DESC LIMIT 1));
+
+ -- Procedimientos almacenados
 
 DELIMITER //
 CREATE PROCEDURE obtenerPolizasCliente(IN clienteID INT)
@@ -364,6 +402,10 @@ DELIMITER ;
 
 call obtenerPolizasCliente(3);
 
+ -- Vistas
+
+ -- Crear una vista que muestre el nombre del cliente, la aseguradora, el número de póliza y el monto pagado
+
 CREATE VIEW vistaPolizasClientes AS
 SELECT c.nombreCliente, a.nombreAseguradora, po.numeroPoliza, po.montoPagado
 FROM Cliente c
@@ -371,3 +413,558 @@ JOIN Poliza po ON c.idCliente = po.idClienteFK
 JOIN Aseguradora a ON po.idAseguradoraFK = a.idAseguradora;
 
 select * from vistaPolizasClientes;
+
+SELECT c.nombreCliente, a.nombreAseguradora, po.numeroPoliza, po.montoPagado
+FROM Cliente c
+JOIN Poliza po ON c.idCliente = po.idClienteFK
+JOIN Aseguradora a ON po.idAseguradoraFK = a.idAseguradora
+where c.idCliente = 1;
+
+DELIMITER //
+CREATE PROCEDURE crearCliente(idCliente INT,nombreCliente varchar(40), direccionCliente varchar(40), telefonoCliente varchar(40), emailCliente varchar(40))
+BEGIN
+    INSERT INTO cliente Values (idCliente, nombreCliente, direccionCliente, telefonoCliente,emailCliente);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE crearUsuario(idUsuario INT,nombreUsuario varchar(40), emailUsuario varchar(40), rolUsuario varchar(20), passwordUsuario varchar(20))
+BEGIN
+    INSERT INTO usuario Values (idUsuario, nombreUsuario, emailUsuario, rolUsuario, passwordUsuario);
+END //
+DELIMITER ;
+
+select * from cliente where idCliente = 52;
+describe usuario;
+
+DELIMITER //
+
+CREATE PROCEDURE consultarUsuario(
+    IN idUsuarioInput INT
+)
+BEGIN
+    -- Consulta al usuario por su ID
+    SELECT * 
+    FROM usuario 
+    WHERE idUsuario = idUsuarioInput;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE modificarUsuario(
+    IN idUsuarioInput INT,
+    IN nuevoNombreUsuario VARCHAR(40),
+    IN nuevoEmailUsuario VARCHAR(40),
+    IN nuevoRolUsuario VARCHAR(20),
+    IN nuevaPasswordUsuario VARCHAR(20)
+)
+BEGIN
+    -- Actualiza los datos del usuario por su ID
+    UPDATE usuario
+    SET 
+        nombreUsuario = nuevoNombreUsuario,
+        emailUsuario = nuevoEmailUsuario,
+        rolUsuario = nuevoRolUsuario,
+        passwordUsuario = nuevaPasswordUsuario
+    WHERE idUsuario = idUsuarioInput;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE eliminarUsuario(
+    IN idUsuarioInput INT
+)
+BEGIN
+    -- Elimina el usuario por su ID
+    DELETE FROM usuarios
+    WHERE idUsuario = idUsuarioInput;
+
+END //
+
+DELIMITER ;
+
+
+call crearCliente('', 'Carlos Ramirez', 'Rio Nilo 1232', '3356123421','carlitosGR@gmail.com');
+
+DELIMITER $$
+
+create trigger validar_precio after insert on poliza for each row
+begin 
+	if new.montoTotal <0 then 
+		signal sqlstate '45000'
+		set message_text='El precio es incorrecto';
+	end if;
+end $$
+
+DELIMITER ;
+
+ALTER TABLE Poliza 
+ADD COLUMN montoPendiente DECIMAL(10, 2);
+
+describe poliza;
+
+drop TRIGGER insertar_precioPendiente;
+
+DELIMITER $$
+
+CREATE TRIGGER validar_precioPendiente
+BEFORE INSERT ON Poliza
+FOR EACH ROW
+BEGIN
+    -- Validar que el monto pendiente no sea negativo
+    IF (NEW.montoTotal - NEW.montoPagado) < 0 THEN 
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El Monto pagado es mayor al que le resta pagar';
+    ELSE
+        -- Calcular monto pendiente
+        SET NEW.montoPendiente = NEW.montoTotal - NEW.montoPagado;
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+drop TRIGGER actualizar_montoPagado;
+use seguros;
+DELIMITER $$
+
+CREATE TRIGGER actualizar_montoPagado
+AFTER INSERT ON Pago
+FOR EACH ROW
+BEGIN
+	IF (montoPendiente = montoTotal - (montoPagado + NEW.montoPago)) < 0 THEN 
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El Monto pagado es mayor al que le resta pagar';
+    ELSE
+		UPDATE Poliza
+		SET montoPagado = montoPagado + NEW.montoPago,
+			montoPendiente = montoTotal - (montoPagado + NEW.montoPago)
+		WHERE numeroPoliza = NEW.numeroPolizaFK;
+	end if;
+	END$$
+
+DELIMITER ;
+drop trigger actualizarPagoEnPoliza;
+DELIMITER //
+
+CREATE TRIGGER actualizarPagoEnPoliza
+AFTER INSERT ON pago
+FOR EACH ROW
+BEGIN
+    DECLARE nuevoMontoPagado DECIMAL(10, 2);
+    DECLARE nuevoMontoPendiente DECIMAL(10, 2);
+    DECLARE montoTotal DECIMAL(10, 2);
+    
+    -- Obtener el monto total y pagado actual de la póliza
+    SELECT montoTotal, montoPagado INTO montoTotal, nuevoMontoPagado
+    FROM poliza
+    WHERE numeroPoliza = NEW.numeroPolizaFK;
+
+    -- Sumar el nuevo pago al monto pagado actual
+    SET nuevoMontoPagado = nuevoMontoPagado + NEW.montoPago;
+
+    -- Verificar que la suma no exceda el monto total de la póliza
+    IF nuevoMontoPagado <= montoTotal THEN
+        -- Calcular el nuevo monto pendiente
+        SET nuevoMontoPendiente = montoTotal - nuevoMontoPagado;
+
+        -- Actualizar la póliza con los nuevos montos
+        UPDATE poliza
+        SET montoPagado = nuevoMontoPagado, montoPendiente = nuevoMontoPendiente
+        WHERE numeroPoliza = NEW.numeroPolizaFK;
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El pago excede el monto total de la póliza';
+    END IF;
+END //
+
+DELIMITER ;
+drop trigger ActualizarPagosPolizaDespuesUpdate;
+describe pago;
+
+DELIMITER //
+
+CREATE TRIGGER ActualizarPagosPolizaDespuesUpdate
+AFTER UPDATE ON pago
+FOR EACH ROW
+
+BEGIN
+	Declare sumaMontoPago decimal(10,2);
+    Declare montoTotal decimal(10,2);
+    DECLARE montoPendiente DECIMAL(10, 2);
+    
+    select sum(montoPago) into sumaMontoPago
+    from pago
+    where numeroPolizaFK = New.numeroPolizaFK;
+    
+    select montoTotal into montoTotal
+    from poliza
+    where numeroPoliza = new.numeroPolizaFK;
+	
+
+    
+	SET montoPendiente = montoTotal - sumaMontoPago;
+		
+	update poliza set montoPagado = sumaMontoPago, 
+	montoPendiente = montoPendiente
+	where numeroPoliza = new.numeroPolizaFK;
+
+    
+END //
+
+DELIMITER ;
+
+
+INSERT INTO Vehiculo (marcaVehiculo, modeloVehiculo, añoVehiculo, placaVehiculo) VALUES
+('Mazda', 'Mazda3', 2024, 'JDB123');
+
+INSERT INTO Vehiculo (marcaVehiculo, modeloVehiculo, añoVehiculo, placaVehiculo) VALUES
+('Mazda', 'Mazda2', 2023, 'JDZ123');
+
+INSERT INTO Vehiculo (marcaVehiculo, modeloVehiculo, añoVehiculo, placaVehiculo) VALUES
+('Audi', '8', 2023, 'SDZ373');
+
+select * from vehiculo;
+select * from poliza;
+select * from pago;
+
+INSERT INTO Poliza (numeroPoliza, fechaInicio, fechaFin, montoPagado, idClienteFK, idUsuarioFK, idAseguradoraFK, idVehiculoFK, montoTotal) VALUES
+('A1051', '2023-10-18', '2024-10-18', 500.00, 1, 2, 3, 51,3500);
+
+INSERT INTO Poliza (numeroPoliza, fechaInicio, fechaFin, montoPagado, idClienteFK, idUsuarioFK, idAseguradoraFK, idVehiculoFK, montoTotal) VALUES
+('A1052', '2022-10-18', '2023-10-18', 800.00, 1, 2, 1, 51,3500);
+
+INSERT INTO Poliza (numeroPoliza, fechaInicio, fechaFin, montoPagado, idClienteFK, idUsuarioFK, idAseguradoraFK, idVehiculoFK, montoTotal) VALUES
+('A1053', '2022-10-18', '2023-10-18', 500.00, 1, 2, 1, 52,3500);
+
+INSERT INTO Poliza (numeroPoliza, fechaInicio, fechaFin, montoPagado, idClienteFK, idUsuarioFK, idAseguradoraFK, idVehiculoFK, montoTotal) VALUES
+('A1054', '2021-10-18', '2022-10-18', 5000.00, 3, 1, 3, 53,3500);
+
+DELETE FROM Poliza
+WHERE numeroPoliza = 'A1054';
+
+UPDATE Poliza SET montoTotal = 6000 where numeroPoliza = 'A1051';
+INSERT INTO Pago (idPago, metodoPago, montoPago, numeroPolizaFK) VALUES
+('52','Tarjeta de Crédito', 500.00, 'A1051');
+
+use seguros;
+describe poliza;
+
+use seguros;
+
+DELIMITER //
+CREATE PROCEDURE crearPoliza(IN numeroPoliza VARCHAR(20), IN fechaInicio DATE, IN fechaFin DATE, IN montoPagado DECIMAL(10, 2), IN idClienteFK INT,
+	IN idUsuarioFK INT, IN idAseguradoraFK INT, IN idVehiculoFK INT, IN montoTotal DECIMAL(10, 2), IN montoPendiente DECIMAL(10, 2))
+BEGIN
+    INSERT INTO poliza (numeroPoliza, fechaInicio, fechaFin, montoPagado, idClienteFK, idUsuarioFK, idAseguradoraFK, idVehiculoFK,
+        montoTotal,montoPendiente)
+    VALUES (numeroPoliza,fechaInicio,fechaFin,montoPagado, idClienteFK, idUsuarioFK, idAseguradoraFK, idVehiculoFK, montoTotal, montoPendiente);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE modificarPoliza(IN numeroPoliza VARCHAR(50), IN nuevaFechaInicio DATE, IN nuevaFechaFin DATE,
+     IN nuevoMontoTotal DECIMAL(10, 2))
+BEGIN
+
+    UPDATE poliza
+    SET fechaInicio = nuevaFechaInicio,
+        fechaFin = nuevaFechaFin,
+        montoTotal = nuevoMontoTotal
+    WHERE numeroPoliza = numeroPoliza;
+
+
+END //
+
+DELIMITER ;
+ 
+
+
+DELIMITER //
+
+CREATE PROCEDURE consultarEstadoPoliza(
+    IN numeroPolizaInput VARCHAR(50)
+)
+BEGIN
+    DECLARE fechaFinActual DATE;
+
+    -- Obtén la fecha de fin de la póliza
+    SELECT fechaFin INTO fechaFinActual
+    FROM poliza
+    WHERE numeroPoliza = numeroPolizaInput;
+    
+    -- Verifica si la póliza ha expirado o sigue activa
+    IF fechaFinActual < CURDATE() THEN
+        SELECT CONCAT('La póliza ', numeroPolizaInput, ' ha expirado el ', DATE_FORMAT(fechaFinActual, '%Y-%m-%d')) AS estadoPoliza;
+    ELSE
+        SELECT CONCAT('La póliza ', numeroPolizaInput, ' está activa hasta el ', DATE_FORMAT(fechaFinActual, '%Y-%m-%d')) AS estadoPoliza;
+    END IF;
+END //
+
+DELIMITER ;
+drop procedure consultarPoliza;
+DELIMITER //
+
+CREATE PROCEDURE consultarPoliza(IN numeroPolizaInput varchar(20))
+BEGIN
+    SELECT * FROM poliza WHERE numeroPoliza = numeroPolizaInput;
+END //
+
+DELIMITER ;
+CALL consultarPoliza('A1003');
+CALL consultarEstadoPoliza('A1003');
+select * from poliza;
+describe aseguradora;
+
+DELIMITER //
+
+CREATE PROCEDURE eliminarPoliza(
+    IN numeroPolizaInput VARCHAR(50)
+)
+BEGIN
+    DELETE FROM poliza WHERE numeroPoliza = numeroPolizaInput;
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE crearAseguradora(
+    IN nombreAseguradora VARCHAR(20)
+)
+BEGIN
+
+    INSERT INTO aseguradora (nombreAseguradora)
+    VALUES (nombreAseguradora);
+
+END //
+
+DELIMITER ;
+call crearAseguradora("Chub Seguros");
+DELIMITER //
+
+CREATE PROCEDURE eliminarAseguradora(
+    IN idAseguradoraInput INT
+)
+BEGIN
+    DELETE FROM aseguradora WHERE idAseguradora = idAseguradoraInput;
+
+END //
+
+DELIMITER ;
+call eliminarAseguradora(4);
+DELIMITER //
+
+CREATE PROCEDURE consultarAseguradora(
+    IN idAseguradoraInput INT
+)
+BEGIN
+    SELECT * FROM aseguradora WHERE idAseguradora = idAseguradoraInput;
+END //
+
+DELIMITER ;
+call consultarAseguradora(4);
+
+DELIMITER //
+
+CREATE PROCEDURE modificarAseguradora(
+    IN idAseguradoraInput INT,
+    IN nuevoNombre VARCHAR(20)
+)
+BEGIN
+    UPDATE aseguradora 
+    SET nombreAseguradora = nuevoNombre 
+    WHERE idAseguradora = idAseguradoraInput;
+END //
+
+DELIMITER ;
+call modificarAseguradora(4,"CHUBB");
+
+
+describe pago;
+DELIMITER //
+
+CREATE PROCEDURE crearPago(
+    IN metodoPago VARCHAR(50),
+    IN montoPago DECIMAL(10, 2),
+    IN numeroPolizaFK VARCHAR(20)
+)
+BEGIN
+    INSERT INTO pago (metodoPago, montoPago, numeroPolizaFK)
+    VALUES (metodoPago, montoPago, numeroPolizaFK);
+
+
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE consultarPago(IN idPagoInput INT)
+BEGIN
+    SELECT * FROM pago WHERE idPago = idPagoInput;
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE modificarPago(IN idPagoInput INT, IN nuevoMetodoPago VARCHAR(50),IN nuevoMontoPago DECIMAL(10, 2),
+IN nuevoNumeroPolizaFK VARCHAR(20))
+BEGIN
+    UPDATE pago
+    SET 
+        metodoPago = nuevoMetodoPago,
+        montoPago = nuevoMontoPago,
+        numeroPolizaFK = nuevoNumeroPolizaFK
+    WHERE idPago = idPagoInput;
+    
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE eliminarPago(IN idPagoInput INT)
+BEGIN
+    DELETE FROM pago WHERE idPago = idPagoInput;
+END //
+
+DELIMITER ;
+
+
+describe vehiculo;
+Select * from poliza;
+select* from pago;
+DELIMITER //
+
+CREATE PROCEDURE crearVehiculo(
+    IN marcaVehiculo VARCHAR(20),
+    IN modeloVehiculo VARCHAR(40),
+    IN añoVehiculo YEAR,
+    IN placaVehiculo VARCHAR(20)
+)
+BEGIN
+
+    INSERT INTO vehiculo (marcaVehiculo, modeloVehiculo, añoVehiculo, placaVehiculo)
+    VALUES (marcaVehiculo, modeloVehiculo, añoVehiculo, placaVehiculo);
+
+END //
+
+DELIMITER ;
+call crearVehiculo("Volkswagen", "Tiguan", 2020,"JFD102");
+DELIMITER //
+
+CREATE PROCEDURE consultarVehiculo(
+    IN idVehiculoInput INT
+)
+BEGIN
+    SELECT * FROM vehiculo WHERE idVehiculo = idVehiculoInput;
+END //
+
+DELIMITER ;
+
+call consultarVehiculo(1);
+DELIMITER //
+
+CREATE PROCEDURE modificarVehiculo(
+    IN idVehiculoInput INT,
+    IN nuevaMarca VARCHAR(20),
+    IN nuevoModelo VARCHAR(40),
+    IN nuevoAño YEAR,
+    IN nuevaPlaca VARCHAR(20)
+)
+BEGIN
+    UPDATE vehiculo 
+    SET 
+        marcaVehiculo = nuevaMarca,
+        modeloVehiculo = nuevoModelo,
+        añoVehiculo = nuevoAño,
+        placaVehiculo = nuevaPlaca
+    WHERE idVehiculo = idVehiculoInput;
+
+END //
+
+DELIMITER ;
+call modificarVehiculo(3,"SEAT", "Ibiza", 2024, "GHI777");
+
+DELIMITER //
+
+CREATE PROCEDURE eliminarVehiculo(
+    IN idVehiculoInput INT
+)
+BEGIN
+    DELETE FROM vehiculo WHERE idVehiculo = idVehiculoInput;
+
+END //
+
+DELIMITER ;
+
+create view consultarMontoPagado AS
+select numeroPoliza, montoPagado
+from poliza;
+describe usuario;
+SELECT * FROM consultarMontoPagado WHERE numeroPoliza = "A1003";
+
+
+call eliminarVehiculo(54);
+describe Cliente;
+select * from poliza;
+select * from pago where numeroPolizaFK = "A1007";
+
+describe pago;
+call crearPago("Transferencia", 200, "A1007");
+call crearPago("Transferencia", 100, "A1007");
+call modificarPago(7,"Efectivo",1500,"A1007");
+use seguros;
+
+SELECT SUM(montoPago) + 1700-1400
+    FROM pago
+    WHERE numeroPolizaFK = "A1007";
+    
+    
+DELIMITER //
+
+CREATE TRIGGER actualizarPagoEnPoliza
+AFTER INSERT ON pago
+FOR EACH ROW
+BEGIN
+    DECLARE nuevoMontoPagado DECIMAL(10, 2);
+    DECLARE nuevoMontoPendiente DECIMAL(10, 2);
+    DECLARE montoTotal DECIMAL(10, 2);
+
+    -- Obtener el monto total de la póliza
+    SELECT montoTotal INTO montoTotal
+    FROM poliza
+    WHERE numeroPoliza = NEW.numeroPolizaFK;
+
+
+
+    -- Sumar todos los pagos registrados para la póliza
+    SELECT SUM(montoPago) INTO nuevoMontoPagado
+    FROM pago
+    WHERE numeroPolizaFK = NEW.numeroPolizaFK;
+
+
+
+    -- Verificar que la suma de todos los pagos no exceda el monto total
+        -- Calcular el monto pendiente
+	SET nuevoMontoPendiente = montoTotal - nuevoMontoPagado;
+
+        -- Actualizar la póliza con los nuevos montos
+	UPDATE poliza
+	SET montoPagado = nuevoMontoPagado, 
+		montoPendiente = nuevoMontoPendiente
+	WHERE numeroPoliza = NEW.numeroPolizaFK;
+
+END //
+
+DELIMITER ;
