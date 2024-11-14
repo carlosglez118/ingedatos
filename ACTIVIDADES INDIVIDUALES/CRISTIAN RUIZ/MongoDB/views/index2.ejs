@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- Tabla de Productos -->
+  <h2>Lista de Productos</h2>
+  <table border="1" id="productos">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Precio</th>
+        <th>Categoría</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (productos && productos.length > 0) { %>
+        <% productos.forEach(function(producto) { %>
+          <tr>
+            <td><%= producto._id %></td>
+            <td><%= producto.name %></td>
+            <td><%= producto.precio %></td>
+            <td><%= producto.categoria %></td>
+            <td><%= producto.EnStock %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr><td colspan="4">No hay productos disponibles</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</body>
+</html>
