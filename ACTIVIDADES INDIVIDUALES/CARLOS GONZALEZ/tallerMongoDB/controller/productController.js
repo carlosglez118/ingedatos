@@ -95,7 +95,7 @@ export const stockFalse = async (peticion, respuesta) => {
 
         // Actualizar documentos donde el precio es mayor a 500 y establecer `stock` en el valor proporcionado
         const resultado = await productModel.updateMany(
-            { /*precio: { $gte: 500 }*/ },  // Condición para precios mayores a 500
+            { precio: { $gte: 500 } },  // Condición para precios mayores a 500
             { $set: { stock: valor } }  // Establece `stock` en `valor` 
         );
 
