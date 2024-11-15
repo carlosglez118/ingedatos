@@ -3,8 +3,8 @@ import { carModel } from "../model/carModel.js";
 // Obtener los datos de los usuarios
 export const obtenerDatos = async (peticion, respuesta) => {
     try {
-        let usuarios = await carModel.find()
-        respuesta.status(200).send(usuarios);
+        let carros = await carModel.find()
+        respuesta.status(200).send(carros);
     } catch (error) {
         console.log(error);
         respuesta.status(500).send("Error al obtener los datos");
