@@ -30,6 +30,10 @@ db.albumes.updateOne({name: "1989"}, {$set: {ventas: 10000000}})
 
 db.artistas.deleteOne({name: "The Beatles"})
 
+db.albumes.deleteMany({anio: {$lt: 2000}})
+
+db.artistas.find({pais: "España"})
+
 db.albumes.aggregate([
   { $group: { _id: "$artista", totalAlbums: { $sum: 1 } } },
   { $sort: { totalAlbums: -1 } }
