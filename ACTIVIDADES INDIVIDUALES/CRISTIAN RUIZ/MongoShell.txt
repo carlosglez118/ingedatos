@@ -1,0 +1,45 @@
+tienda_musica
+db.createCollection("artistas")
+db.createCollection("albumes")
+
+db.artistas.insertMany([
+{artista:"The Beatles", genero:"Rock", nacionalidad:"Reino Unido"},
+{artista:"Taylor Swift", genero:"Pop", nacionalidad:"Estados Unidos"},
+{artista:"Shakira", genero:"Latino", nacionalidad:"Colombia"}
+])
+
+db.albumes.insertMany([
+{album:"Abbey Road", artista:"The Beatles", anio_lanzamiento:1969},
+{album:"1989", artista:"Taylor Swift", anio_lanzamiento:2014},
+{album:"El Dorado", artista:"Shakira", anio_lanzamiento:2017}
+])
+
+db.artistas.find()
+db.albumes.findOne({artista: "Shakira"})
+db.artistas.findOne({genero: "Rock"})
+db.albumes.find({ anio_lanzamiento: { $gt: 2000 } })
+
+db.artistas.updateOne({artista:"Shakira"},{$set: {nacionalidad: "España"}})
+db.artistas.findOne({artista: "Shakira"})
+db.albumes.updateOne({album:"1989"},{$set: {ventas: 10000000}})
+
+db.artistas.deleteOne({artista: "The Beatles"})
+db.albumes.deleteMany({anio_lanzamiento: {$lt: 2000}})
+db.albumes.aggregate([
+  {$group: {
+      _id: "$artista",
+      total_albumes: { $sum: 1 }
+    }
+  }
+])
+
+
+db.albumes.aggregate([
+  {
+    $group: {
+      _id: "$artista",
+      total_albumes: { $sum: 1 }
+    }
+  },
+  { $sort: { total_albumes: -1 } },
+  { $limit: 1 }])
