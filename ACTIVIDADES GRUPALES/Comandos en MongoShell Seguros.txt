@@ -1,0 +1,257 @@
+db.poliza.insert([{
+    "n_poliza": "A001",
+    "fecha_inicio": "2024-01-12T00:00:00.000Z",
+    "fecha_fin": "2024-12-12T00:00:00.000Z",
+    "monto_pagado": 3000,
+    "nombre_cliente": "Lucia Bravo",
+    "usuario": "Juan",
+    "aseguradora": "El Potosi",
+    "vehiculo": "Toyora Prius 2025",
+    "placa_vehiculo": "WBM788",
+    "montoTotal": 3500,
+    "status": true,
+    "montoPendiente": 500
+},
+{
+    "n_poliza": "A002",
+    "fecha_inicio": "2024-01-12T00:00:00.000Z",
+    "fecha_fin": "2024-12-12T00:00:00.000Z",
+    "monto_pagado": 3500,
+    "nombre_cliente": "Carlos Gonzalez",
+    "usuario": "Juan",
+    "aseguradora": "Qualitas",
+    "vehiculo": "Chevrolet Blazer 2024",
+    "placa_vehiculo": "MIC118",
+    "montoTotal": 4000,
+    "status": true,
+    "montoPendiente": 500
+},
+{
+    "n_poliza": "A003",
+    "fecha_inicio": "2024-03-19T00:00:00.000Z",
+    "fecha_fin": "2025-01-01T00:00:00.000Z",
+    "monto_pagado": 5500,
+    "nombre_cliente": "Jose Perez",
+    "usuario": "Juan",
+    "aseguradora": "Qualitas",
+    "vehiculo": "Nissan Frontier 2018",
+    "placa_vehiculo": "NIS555",
+    "montoTotal": 8000,
+    "montoPendiente": 2500,
+    "status": true
+},
+{
+    "n_poliza": "A004",
+    "fecha_inicio": "2024-05-01T00:00:00.000Z",
+    "fecha_fin": "2025-05-01T00:00:00.000Z",
+    "monto_pagado": 0,
+    "nombre_cliente": "Juan Rodriguez",
+    "usuario": "Juan",
+    "aseguradora": "Seguros Monterrey",
+    "vehiculo": "Nissan Tiida 2015",
+    "placa_vehiculo": "NVG707",
+    "montoTotal": 4500,
+    "montoPendiente": 4500,
+    "status": true
+},
+{
+    "n_poliza": "A005",
+    "fecha_inicio": "2024-03-11T00:00:00.000Z",
+    "fecha_fin": "2024-06-11T00:00:00.000Z",
+    "monto_pagado": 5000,
+    "nombre_cliente": "Elena Martinez",
+    "usuario": "Juan",
+    "aseguradora": "AXA",
+    "vehiculo": "Toyota Tacoma 2020",
+    "placa_vehiculo": "PRC145",
+    "montoTotal": 5000,
+    "montoPendiente": 0,
+    "status": false
+},
+{
+    "n_poliza": "A006",
+    "fecha_inicio": "2024-03-19T00:00:00.000Z",
+    "fecha_fin": "2026-03-19T00:00:00.000Z",
+    "monto_pagado": 3500,
+    "nombre_cliente": "Emiliano Perez",
+    "usuario": "Juan",
+    "aseguradora": "Atlas",
+    "vehiculo": "Ford Escape 2014",
+    "placa_vehiculo": "ALA555",
+    "montoTotal": 8000,
+    "montoPendiente": 4500,
+    "status": true
+},
+{
+    "n_poliza": "A007",
+    "fecha_inicio": "2024-10-19T00:00:00.000Z",
+    "fecha_fin": "2025-10-19T00:00:00.000Z",
+    "monto_pagado": 1000,
+    "nombre_cliente": "Viridiana Hernandez",
+    "usuario": "Juan",
+    "aseguradora": "Atlas",
+    "vehiculo": "Kia Forte 2018",
+    "placa_vehiculo": "TUY781",
+    "montoTotal": 6500,
+    "montoPendiente": 5500,
+    "status": true
+},
+{
+    "n_poliza": "A008",
+    "fecha_inicio": "2024-11-23T00:00:00.000Z",
+    "fecha_fin": "2026-11-23T00:00:00.000Z",
+    "monto_pagado": 0,
+    "nombre_cliente": "Maria Ramirez",
+    "usuario": "Juan",
+    "aseguradora": "El Potosi",
+    "vehiculo": "Honda CRV 2013",
+    "placa_vehiculo": "ASD852",
+    "montoTotal": 10000,
+    "montoPendiente": 10000,
+    "status": true
+},
+{
+    "n_poliza": "A009",
+    "fecha_inicio": "2024-06-06T00:00:00.000Z",
+    "fecha_fin": "2024-12-10T00:00:00.000Z",
+    "monto_pagado": 4501,
+    "nombre_cliente": "Juan Bribiesca",
+    "usuario": "Juan",
+    "aseguradora": "Qualitas",
+    "vehiculo": "Honda Oddyssey 2013",
+    "placa_vehiculo": "GKJ100",
+    "montoTotal": 9000,
+    "montoPendiente": 4499,
+    "status": true
+},
+{
+    "n_poliza": "A010",
+    "fecha_inicio": "2023-12-12T00:00:00.000Z",
+    "fecha_fin": "2024-12-12T00:00:00.000Z",
+    "monto_pagado": 9800,
+    "nombre_cliente": "Alma Gutierrez",
+    "usuario": "Juan",
+    "aseguradora": "Seguros Monterrey",
+    "vehiculo": "Chevrolet Silverado 2020",
+    "placa_vehiculo": "PVB780",
+    "montoTotal": 10000,
+    "montoPendiente": 200,
+    "status": true
+}]);
+
+
+Consultas Básicas:
+
+Obtener todas las pólizas:
+   db.poliza.find();
+
+Obtener las pólizas activas (status: true)
+   db.poliza.find({ status: true });
+
+
+Obtener las pólizas de una aseguradora específica:
+   db.poliza.find({ aseguradora: "El Potosi" });
+
+Mostrar una póliza específica por número:
+   db.poliza.find({ n_poliza: "A001" });
+
+Obtener pólizas cuyo monto pagado sea mayor a un valor:
+
+   db.poliza.find({ monto_pagado: { $gt: 3000 } });
+
+Mostrar la póliza de un vehículo según su placa:
+
+   db.poliza.findOne({ placa_vehiculo: "WBM788" });
+
+Obtener pólizas vencidas (fecha_fin < hoy):
+db.poliza.find({ fecha_fin: { $lt: new Date() } });
+
+
+
+Consultas Específicas:
+
+Obtener pólizas por monto total en orden descendente:
+   db.poliza.find().sort({ montoTotal: -1 });
+
+Agrupar pólizas por aseguradora y contar cuántas tiene cada una:
+   db.poliza.aggregate([
+       { $group: { _id: "$aseguradora", total: { $sum: 1 } } }
+   ]);
+
+Filtrar pólizas por rango de monto pagado:
+
+   db.poliza.find({ monto_pagado: { $gte: 1000, $lte: 5000 } });
+
+
+Obtener pólizas con más del 50% del monto total pagado:
+
+   db.poliza.find({ $expr: { $gt: ["$monto_pagado", { $divide: ["$montoTotal", 2] }] } });
+
+
+Obtener pólizas con pagos pendientes:
+
+   db.poliza.find({ montoPendiente: { $gt: 0 } });
+
+
+Obtener pólizas que vencen en los próximos X días:
+{status: true,
+    fecha_fin: {$gte: '2024-11-24', $lte: '2024-12-24'}}
+
+
+Cliente con el mayor monto total asegurado:
+
+   db.poliza.aggregate([
+       { $group: { _id: "$nombre_cliente", totalAsegurado: { $sum: "$montoTotal" } } },
+       { $sort: { totalAsegurado: -1 } },
+       { $limit: 1 }
+   ]);
+
+
+Modificaciones:
+
+Actualizar status manualmente:
+
+   db.poliza.updateMany({ n_poliza: "A001" }, { $set: { status: false } });
+
+
+Actualizar datos específicos de una póliza:
+
+   db.poliza.updateOne(
+       { n_poliza: "A001" },
+       { $set: { aseguradora: "Nueva Aseguradora", vehiculo: "Toyota Corolla 2023" } }
+   );
+
+
+Calcular y actualizar el monto pendiente:
+
+   db.poliza.find().forEach(poliza => {
+       const montoPendiente = poliza.montoTotal - poliza.monto_pagado;
+       db.poliza.updateOne({ _id: poliza._id }, { $set: { montoPendiente } });
+   });
+
+
+Registrar un nuevo pago:
+
+   const n_poliza = "A001";
+   const nuevoPago = 1000;
+   const poliza = db.poliza.findOne({ n_poliza });
+   if (poliza) {
+       const monto_pagado = poliza.monto_pagado + nuevoPago;
+       const montoPendiente = poliza.montoTotal - monto_pagado;
+       db.poliza.updateOne({ n_poliza }, { $set: { monto_pagado, montoPendiente } });
+   }
+
+
+Actualizar el status a false si la fecha de fin ya pasó:
+
+   const fechaActual = new Date();
+   db.poliza.updateMany({ fecha_fin: { $lt: fechaActual } }, { $set: { status: false } });
+
+
+---
+
+Eliminación:
+
+Eliminar una póliza específica por número:
+
+   db.poliza.deleteOne({ n_poliza: "A001" });
